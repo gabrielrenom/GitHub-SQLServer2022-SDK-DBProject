@@ -1,14 +1,29 @@
-DeploySQL2022DB:
-  needs: build
-  runs-on: self-hosted
-  steps:
-    - name: download artifact containing dacpac
-      uses: actions/download-artifact@v3.0.2
-      with:
-        name: SQLDB
-    - name: Azure SQL Deploy
-      uses: Azure/sql-action@v1.3
-      with:
-        server-name: '${{ secrets.SQLDB_SERVER }}'
-        connection-string: '${{ secrets.SQLDB_CONNECTION_STRING }}'
-        dacpac-package: GA-SQLServer2022-SDK-DBProject.dacpac
+name: SQL Server Deployment
+
+on:
+  push:
+    branches:
+      - main  # Change this to the branch you want to trigger the deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.0.1
+
+      - name: Build SQL Server project
+        run: msbuild GA-SQLServer2022-SDK-DBProject.sqlproj /t:Build /p:Configuration=Release
+
+      - name: Publish SQL Server project
+        run: msbuild GA-SQLServer2022-SDK-DBProject.sqlproj /t:Publish /p:Configuration=Release /p:SqlPublishProfilePath=PublishProfile.publish.xml
+
+      - name: Install sqlcmd
+        run: sudo apt-get install -y mssql-tools unixodbc-dev
+
+      - name: Deploy SQL Server project
+        run: sqlcmd -S tcp:15.188.231.120,1433 -d testgit -U NCPAdmin -P fgDS67:54 -i GA-SQLServer2022-SDK-DBProject.sql
