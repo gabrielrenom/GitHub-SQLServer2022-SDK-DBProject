@@ -11,22 +11,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Build SQL Server project
+      - name: Install SQL Server Data Tools (SSDT)
         run: |
           sudo apt-get update
+          sudo apt-get install -y mssql-tools
           sudo apt-get install -y msbuild
-          msbuild GA-SQLServer2022-SDK-DBProject.sqlproj /t:Build /p:Configuration=Release
+          sudo apt-get install -y sqlpackage
 
-      - name: Publish SQL Server project
+      - name: Build and Deploy SQL Server project
         run: |
-          msbuild GA-SQLServer2022-SDK-DBProject.sqlproj /t:Publish /p:Configuration=Release /p:SqlPublishProfilePath=PublishProfile.publish.xml
+          msbuild /t:Build /p:Configuration=Release GitHub-SQLServer2022-SDK-DBProject.sqlproj
+          sqlpackage /Action:Publish /SourceFile:./GitHub-SQLServer2022-SDK-DBProject/bin/Release/GitHub-SQLServer2022-SDK-DBProject.dacpac /TargetConnectionString:"Server=tcp:15.188.231.120,1433;Initial Catalog=testgit;Persist Security Info=False;User ID=NCPAdmin;Password=fgDS67:54;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=120;" /p:BlockOnPossibleDataLoss=False
 
-      - name: Install sqlcmd
-        run: |
-          sudo apt-get install -y mssql-tools unixodbc-dev
-
-      - name: Deploy SQL Server project
-        run: |
-          sqlcmd -S tcp:15.188.231.120,1433 -d testgit -U NCPAdmin -P fgDS67:54 -i GA-SQLServer2022-SDK-DBProject.sql
 
 
