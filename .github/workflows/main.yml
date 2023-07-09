@@ -1,0 +1,14 @@
+DeploySQL2022DB:
+  needs: build
+  runs-on: self-hosted
+  steps:
+    - name: download artifact containing dacpac
+      uses: actions/download-artifact@v3.0.2
+      with:
+        name: SQLDB
+    - name: Azure SQL Deploy
+      uses: Azure/sql-action@v1.3
+      with:
+        server-name: '${{ secrets.SQLDB_SERVER }}'
+        connection-string: '${{ secrets.SQLDB_CONNECTION_STRING }}'
+        dacpac-package: GA-SQLServer2022-SDK-DBProject.dacpac
