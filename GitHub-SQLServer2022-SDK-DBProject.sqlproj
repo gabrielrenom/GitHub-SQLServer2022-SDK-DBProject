@@ -3,7 +3,7 @@
   <Sdk Name="Microsoft.Build.Sql" Version="0.1.9-preview" />
   <PropertyGroup>
     <Name>GitHub_SQLServer2022_SDK_DBProject</Name>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql150DatabaseSchemaProvider</DSP>
     <ModelCollation>1033, CI</ModelCollation>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <ProjectGuid>{b4630d7f-cddf-4cff-bde3-67cb3c1275dc}</ProjectGuid>
