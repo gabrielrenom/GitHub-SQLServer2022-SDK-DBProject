@@ -1,5 +1,3 @@
-name: SQL Server Deployment
-
 on:
   push:
     branches:
@@ -13,17 +11,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.0.1
-
       - name: Build SQL Server project
-        run: msbuild GA-SQLServer2022-SDK-DBProject.sqlproj /t:Build /p:Configuration=Release
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y msbuild
+          msbuild GA-SQLServer2022-SDK-DBProject.sqlproj /t:Build /p:Configuration=Release
 
       - name: Publish SQL Server project
-        run: msbuild GA-SQLServer2022-SDK-DBProject.sqlproj /t:Publish /p:Configuration=Release /p:SqlPublishProfilePath=PublishProfile.publish.xml
+        run: |
+          msbuild GA-SQLServer2022-SDK-DBProject.sqlproj /t:Publish /p:Configuration=Release /p:SqlPublishProfilePath=PublishProfile.publish.xml
 
       - name: Install sqlcmd
-        run: sudo apt-get install -y mssql-tools unixodbc-dev
+        run: |
+          sudo apt-get install -y mssql-tools unixodbc-dev
 
       - name: Deploy SQL Server project
-        run: sqlcmd -S tcp:15.188.231.120,1433 -d testgit -U NCPAdmin -P fgDS67:54 -i GA-SQLServer2022-SDK-DBProject.sql
+        run: |
+          sqlcmd -S tcp:15.188.231.120,1433 -d testgit -U NCPAdmin -P fgDS67:54 -i GA-SQLServer2022-SDK-DBProject.sql
+
+
